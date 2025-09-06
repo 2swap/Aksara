@@ -1,0 +1,465 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Telugu Handwriting Duel</title>
+
+  <style>
+    :root{
+      --bg:#0b0f13;
+      --muted:#9aa4ad;
+      --accent:#6ee7b7;
+      --card:#0f1728;
+      --border: rgba(255,255,255,0.06);
+      --radius:12px;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      padding:0;
+      background:linear-gradient(180deg,var(--bg),#071019 160%);
+      color:#e6eef6;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* two-column layout: leaderboard (left) + stage (right).
+       status spans the top row */
+    #app{
+      display:grid;
+      grid-template-columns: 260px 1fr;
+      grid-template-rows: auto 1fr;
+      gap:20px;
+      height: calc(100vh - 56px);
+      margin:28px;
+      padding:20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+
+    #status{
+      grid-column: 1 / -1;
+      font-size:13px;
+      color:var(--muted);
+      align-self:center;
+    }
+
+    /* stage area on right */
+    #stage{
+      grid-column: 2;
+      grid-row: 2;
+      display:block;
+      height:100%;
+      overflow:auto;
+    }
+
+    /* leaderboard on left fills full height */
+    #scores{
+      grid-column: 1;
+      grid-row: 2;
+      color:var(--muted);
+      font-size:13px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+      border:2px solid var(--border);
+      padding:10px;
+      border-radius:10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:stretch;
+      height:100%;
+      overflow:auto;
+    }
+
+    #canvasWrap{
+      border-radius:12px;
+      overflow:hidden;
+      display:block;
+      margin:12px auto;
+      border:2px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    }
+
+    canvas{
+      display:block;
+      touch-action:none;
+      background:#071018;
+      width:100%;
+      height:360px;
+    }
+
+    .controls{
+      margin-top:12px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    button{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.03));
+      color:#e6eef6;
+      border:2px solid rgba(255,255,255,0.04);
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      transition:transform .08s ease, box-shadow .08s ease, opacity .12s;
+    }
+
+    button:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(2,6,23,0.5); }
+    button:active{ transform:translateY(0); }
+
+    button.primary{
+      background:linear-gradient(90deg, #0ea5a3, #34d399);
+      color:#021617;
+      border:0;
+    }
+
+    button.ghost{
+      background:transparent;
+      border:2px dashed rgba(255,255,255,0.04);
+    }
+
+    #subs{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin:12px;
+      justify-content:center;
+    }
+
+    .subCard{
+      width:220px;
+      border-radius:12px;
+      padding:10px;
+      background:var(--card);
+      border:2px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:stretch;
+    }
+
+    .subCard img{
+      width:100%;
+      height:150px;
+      object-fit:cover;
+      border-radius:8px;
+      background:#071018;
+      border:2px solid rgba(255,255,255,0.02);
+    }
+
+    .leaderHeader{
+      font-weight:700;
+      color:#dff7eb;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .leaderList{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .leaderItem{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:8px;
+      border-radius:8px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
+      border:2px solid rgba(255,255,255,0.02);
+    }
+
+    .leaderItem.self{
+      background: linear-gradient(90deg, rgba(110,231,183,0.08), rgba(14,165,163,0.03));
+      border:2px solid rgba(110,231,183,0.12);
+      color:#bfffe9;
+    }
+
+    .playerName{
+      font-weight:600;
+      color:#e6eef6;
+      font-size:13px;
+    }
+
+    .playerScore{
+      font-weight:700;
+      color:var(--accent);
+      font-size:13px;
+    }
+
+    .hidden{ display:none; }
+
+    @media (max-width:720px){
+      #app{ grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; margin:12px; padding:12px; }
+      #status{ grid-column: 1; }
+      #stage{ grid-column: 1; grid-row: 2; }
+      #scores{ grid-column: 1; grid-row: 3; height:auto; }
+      canvas{ height:260px; }
+      .subCard{ width:48%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="status">Initializing...</div>
+
+    <div id="stage">
+      <div id="roundArea">
+        <audio id="audioPlayer" style="display:none;"></audio>
+        <div id="canvasWrap">
+          <canvas id="draw" width="1000" height="720"></canvas>
+        </div>
+        <div class="controls">
+          <button id="clear" class="ghost">Clear</button>
+          <button id="submit" class="primary">Submit Drawing</button>
+        </div>
+      </div>
+
+      <div id="showdownArea" class="hidden">
+        <div id="subs"></div>
+      </div>
+    </div>
+
+    <div id="scores"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const statusEl = document.getElementById('status');
+    const roundArea = document.getElementById('roundArea');
+    const showdownArea = document.getElementById('showdownArea');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const canvas = document.getElementById('draw');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    const clearBtn = document.getElementById('clear');
+    const submitBtn = document.getElementById('submit');
+    const subsEl = document.getElementById('subs');
+    const scoresEl = document.getElementById('scores');
+
+    let drawing = false;
+    let last = { x: 0, y: 0 };
+    let hasSubmitted = false;
+
+    // State 0: Name-selection / entry
+    // State 1: Drawing
+    // State 2: Gallery
+    // State 3: Voting
+    // State 4: Results
+    let state = 0;
+
+    function setStatus(t){ statusEl.textContent = t; }
+
+    // ensure canvas backing store matches displayed size and handles high-DPI
+    function resizeCanvas(){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const cssWidth = Math.max(1, Math.round(rect.width));
+      const cssHeight = Math.max(1, Math.round(rect.height));
+      canvas.width = Math.round(cssWidth * dpr);
+      canvas.height = Math.round(cssHeight * dpr);
+      // set transform so drawing coordinates are in CSS pixels
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // set default stroke style
+      ctx.strokeStyle = '#e6eef6';
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function clearCanvas(){
+      // clear full device pixel buffer safely
+      const dpr = window.devicePixelRatio || 1;
+      ctx.save();
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.restore();
+      // ensure transform remains correct
+      resizeCanvas();
+    }
+
+    function getPos(e){
+      const rect = canvas.getBoundingClientRect();
+      if (e.touches) e = e.touches[0];
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
+
+    canvas.addEventListener('pointerdown', (ev)=>{
+      canvas.setPointerCapture(ev.pointerId);
+      drawing = true; last = getPos(ev);
+    });
+    canvas.addEventListener('pointermove', (ev)=>{
+      if (!drawing) return;
+      const p = getPos(ev);
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      last = p;
+    });
+    canvas.addEventListener('pointerup', (ev)=>{ try{ canvas.releasePointerCapture(ev.pointerId); }catch(e){} drawing=false; });
+    canvas.addEventListener('pointerout', ()=>{ drawing=false; });
+
+    clearBtn.onclick = clearCanvas;
+
+    function showSubmissions(submissions = [], isShowdown = false){
+      // show submissions in the shared stage
+      roundArea.classList.add('hidden');
+      showdownArea.classList.remove('hidden');
+      subsEl.innerHTML = '';
+      submissions.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'subCard';
+        const img = document.createElement('img'); img.src = s.image;
+        div.appendChild(img);
+        if (isShowdown) {
+          const btn = document.createElement('button');
+          btn.textContent = 'Vote for this';
+          btn.onclick = ()=>{ socket.emit('vote', { winnerId: s.id }); setStatus('Vote submitted'); };
+          div.appendChild(btn);
+        }
+        subsEl.appendChild(div);
+      });
+
+      // play audio automatically when the round ends (showdown) or when viewing submissions
+      audioPlayer.play().catch(()=>{});
+    }
+
+    submitBtn.onclick = ()=>{
+      // export at displayed resolution
+      const dataUrl = canvas.toDataURL('image/png');
+      socket.emit('submitDrawing', { imageDataUrl: dataUrl });
+      hasSubmitted = true;
+      // hide canvas area immediately after submitting
+      roundArea.classList.add('hidden');
+      showdownArea.classList.add('hidden'); // will be shown when submissions arrive
+      setStatus('Submitted — waiting for others...');
+      // request current submissions from server so submitter can view others without waiting for showdown
+      socket.emit('requestSubmissions');
+    };
+
+    socket.on('connect', ()=>{ setStatus('Connected'); });
+
+    function renderLeaderboard(scores){
+      let entries = [];
+      if (Array.isArray(scores)) {
+        entries = scores.map(s => ({ id: s.id || s.playerId || s.name, name: s.name || s.id || s.playerId, score: s.score || 0 }));
+      } else if (scores && typeof scores === 'object') {
+        entries = Object.keys(scores).map(k => ({ id: k, name: k, score: scores[k] }));
+      } else {
+        entries = [];
+      }
+      entries.sort((a,b) => b.score - a.score);
+
+      scoresEl.innerHTML = '';
+      const header = document.createElement('div');
+      header.className = 'leaderHeader';
+      const hText = document.createElement('div');
+      hText.textContent = 'Leaderboard';
+      const hNote = document.createElement('div');
+      hNote.style.fontSize = '12px'; hNote.style.color = 'var(--muted)';
+      hNote.textContent = 'Score';
+      header.appendChild(hText); header.appendChild(hNote);
+      scoresEl.appendChild(header);
+
+      const list = document.createElement('div');
+      list.className = 'leaderList';
+      entries.forEach((e, idx) => {
+        const item = document.createElement('div');
+        item.className = 'leaderItem';
+        if (e.id === socket.id) item.classList.add('self');
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.alignItems = 'center';
+        left.style.gap = '8px';
+        const rank = document.createElement('div');
+        rank.style.width = '28px';
+        rank.style.fontWeight = '700';
+        rank.style.color = idx === 0 ? 'var(--accent)' : 'var(--muted)';
+        rank.textContent = (idx+1)+'.';
+        const name = document.createElement('div');
+        name.className = 'playerName';
+        name.textContent = e.name || e.id;
+        left.appendChild(rank); left.appendChild(name);
+
+        const score = document.createElement('div');
+        score.className = 'playerScore';
+        score.textContent = e.score;
+
+        item.appendChild(left);
+        item.appendChild(score);
+        list.appendChild(item);
+      });
+
+      scoresEl.appendChild(list);
+    }
+
+    socket.on('joined', ({ scores }) => {
+      renderLeaderboard(scores || {});
+    });
+
+    socket.on('scoresUpdate', (scores) => {
+      renderLeaderboard(scores || {});
+    });
+
+    socket.on('newRound', ({ word, translation, audioUrl }) => {
+      setStatus('New round! Listen and write');
+      // reset submitted state and show canvas area
+      hasSubmitted = false;
+      showdownArea.classList.add('hidden');
+      roundArea.classList.remove('hidden');
+      clearCanvas();
+      if (audioUrl) {
+        audioPlayer.src = audioUrl;
+        audioPlayer.play().catch(()=>{});
+      }
+    });
+
+    socket.on('submissionUpdate', ({ submitted }) => {
+      setStatus(`Submitted: ${submitted}`);
+    });
+
+    // server may respond with current submissions when requested
+    socket.on('submissions', ({ submissions }) => {
+      if (!hasSubmitted) return;
+      showSubmissions(submissions || [], false);
+    });
+
+    socket.on('showdown', ({ submissions }) => {
+      setStatus('Vote for the best handwriting');
+      // Only reveal submissions to users who submitted their drawing
+      if (!hasSubmitted) {
+        showdownArea.classList.add('hidden');
+        setStatus('Showdown started — you did not submit, cannot view or vote');
+        return;
+      }
+
+      // show submissions and enable voting
+      showSubmissions(submissions, true);
+    });
+
+    socket.on('roundResult', ({ winner, scores }) => {
+      if (winner) setStatus(winner === socket.id ? 'You won the round!' : `Player ${winner} won`);
+      else setStatus('Round tied');
+      renderLeaderboard(scores || {});
+    });
+
+    // replay audio by pressing 'r'
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'r' || e.key === 'R') {
+        audioPlayer.play().catch(()=>{});
+        setStatus('Replaying audio');
+      }
+    });
+  </script>
+</body>
+</html>
