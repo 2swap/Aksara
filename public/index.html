@@ -100,8 +100,7 @@
         border:0;
     }
 
-    button:hover{ transform:translateY(-2px); }
-    button:active{ transform:translateY(0); }
+    button:hover{ background:linear-gradient(90deg, #a50079, #a500bb); }
 
     #subs{
         display:flex;
@@ -109,6 +108,12 @@
         flex-wrap:wrap;
         margin:12px;
         justify-content:center;
+    }
+
+    #abstain{
+        display:flex;
+        justify-content:center;
+        margin-top:12px;
     }
 
     .subCard{
@@ -277,6 +282,7 @@
                 <div id="translation"></div>
             </div>
             <div id="subs"></div>
+            <div id="abstain"></div>
         </div>
 
         <div id="timerBar"><div id="timerFill"></div></div>
@@ -488,13 +494,14 @@
             div.appendChild(img);
             if (isShowdown) {
                 const btn = document.createElement('button');
-                btn.textContent = 'Vote for this';
+                btn.textContent = 'Vote';
                 btn.onclick = ()=>{
                     socket.emit('vote', { winnerId: s.id });
                     // Remove all vote buttons after voting
                     document.querySelectorAll('.subCard button').forEach(b => b.remove());
                     // Highlight voted submission
                     img.style.border = '2px solid var(--accent)';
+                    document.getElementById('abstain').innerHTML = '';
                 };
                 div.appendChild(btn);
             }
@@ -502,22 +509,14 @@
         });
 
         if (isShowdown) {
-            const div = document.createElement('div');
-            div.className = 'subCard';
-            // Add empty image placeholder
-            const img = document.createElement('img');
-            // Image should take up space but be invisible
-            img.style.visibility = 'hidden';
-            div.appendChild(img);
             const btn = document.createElement('button');
             btn.textContent = 'Abstain';
             btn.onclick = () => {
-                socket.emit('vote', { winnerIndex: -1 });
+                socket.emit('vote', { winnerId: -1 });
                 document.querySelectorAll('.subCard button').forEach(b => b.remove());
-                btn.style.opacity = '0.6';
+                document.getElementById('abstain').innerHTML = '';
             };
-            div.appendChild(btn);
-            subsEl.appendChild(div);
+            document.getElementById('abstain').appendChild(btn);
         }
   
         // play audio automatically when the round ends (showdown) or when viewing submissions
