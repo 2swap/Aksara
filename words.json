@@ -1,7 +1,12 @@
 [
-  { "word": "అమ్మ", "translation": "mother", "audio": "amma.mp3" },
-  { "word": "నానా", "translation": "father", "audio": "nana.mp3" },
-  { "word": "పుస్తకం", "translation": "book", "audio": "pustakam.mp3" },
-  { "word": "వాన", "translation": "rain", "audio": "vana.mp3" },
-  { "word": "ఆశ", "translation": "hope", "audio": "asha.mp3" }
+    { "word": "అమ్మ", "translation": "mother", "audio": "amma.mp3" },
+    { "word": "నానా", "translation": "father", "audio": "nana.mp3" },
+    { "word": "పుస్తకం", "translation": "book", "audio": "pustakam.mp3" },
+    { "word": "వాన", "translation": "rain", "audio": "vana.mp3" },
+    { "word": "ఆశ", "translation": "hope", "audio": "asha.mp3" },
+    { "word": "స్నేహం", "translation": "friendship", "audio": "sneham.mp3" },
+    { "word": "ప్రేమ", "translation": "love", "audio": "prema.mp3" },
+    { "word": "సూర్యుడు", "translation": "sun", "audio": "sooryudu.mp3" },
+    { "word": "చంద్రుడు", "translation": "moon", "audio": "chandrudu.mp3" },
+    { "word": "పచ్చి", "translation": "green", "audio": "pacchi.mp3" }
 ]

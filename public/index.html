@@ -1,239 +1,264 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Telugu Handwriting Duel</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Aksara Duel</title>
 
-  <style>
+<style>
     :root{
-      --bg:#0b0f13;
-      --muted:#9aa4ad;
-      --accent:#6ee7b7;
-      --card:#0f1728;
-      --border: rgba(255,255,255,0.06);
-      --radius:12px;
+        --bg:#0b0f13;
+        --muted:#9aa4ad;
+        --accent:#6ee7b7;
+        --card:#0f1728;
+        --border: rgba(255,255,255,0.06);
+        --radius:12px;
     }
 
     html,body{
-      height:100%;
-      margin:0;
-      padding:0;
-      background:linear-gradient(180deg,var(--bg),#071019 160%);
-      color:#e6eef6;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+        height:100%;
+        margin:0;
+        padding:0;
+        background:linear-gradient(180deg,var(--bg),#071019 160%);
+        color:#e6eef6;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
     }
 
-    /* two-column layout: leaderboard (left) + stage (right).
-       status spans the top row */
-    #app{
-      display:grid;
-      grid-template-columns: 260px 1fr;
-      grid-template-rows: auto 1fr;
-      gap:20px;
-      height: calc(100vh - 56px);
-      margin:28px;
-      padding:20px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    }
-
-    #status{
-      grid-column: 1 / -1;
-      font-size:13px;
-      color:var(--muted);
-      align-self:center;
+    body{
+        display:grid;
+        grid-template-columns: 260px 1fr;
+        grid-template-rows: 1fr;
+        gap:20px;
+        margin:0px;
+        padding:20px;
+        height:calc(100vh - 40px);
     }
 
     /* stage area on right */
     #stage{
-      grid-column: 2;
-      grid-row: 2;
-      display:block;
-      height:100%;
-      overflow:auto;
+        grid-column: 2;
+        grid-row: 1;
+        display:block;
+        height:100%;
+        overflow:auto;
     }
 
-    /* leaderboard on left fills full height */
+    /* leaderboard on left */
     #scores{
-      grid-column: 1;
-      grid-row: 2;
-      color:var(--muted);
-      font-size:13px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-      border:2px solid var(--border);
-      padding:10px;
-      border-radius:10px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      align-items:stretch;
-      height:100%;
-      overflow:auto;
+        grid-column: 1;
+        grid-row: 1;
+        color:var(--muted);
+        font-size:13px;
+        border:2px solid var(--border);
+        padding:10px;
+        border-radius:10px;
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        align-items:stretch;
+        overflow:auto;
     }
 
     #canvasWrap{
-      border-radius:12px;
-      overflow:hidden;
-      display:block;
-      margin:12px auto;
-      border:2px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+        border-radius:12px;
+        overflow:hidden;
+        display:block;
+        margin:12px auto;
+        border:2px solid var(--border);
+        background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
     }
 
     canvas{
-      display:block;
-      touch-action:none;
-      background:#071018;
-      width:100%;
-      height:360px;
+        display:block;
+        touch-action:none;
+        background:#071018;
+        width:100%;
+        height:360px;
     }
 
     .controls{
-      margin-top:12px;
-      display:flex;
-      gap:8px;
-      align-items:center;
+        margin-top:12px;
+        display:flex;
+        gap:8px;
+        align-items:center;
     }
 
     button{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.03));
-      color:#e6eef6;
-      border:2px solid rgba(255,255,255,0.04);
-      padding:8px 12px;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:600;
-      transition:transform .08s ease, box-shadow .08s ease, opacity .12s;
+        padding:8px 12px;
+        border-radius:10px;
+        cursor:pointer;
+        font-weight:600;
+        transition:transform .08s ease, box-shadow .08s ease, opacity .12s;
+        background:linear-gradient(90deg, #0ea5a3, #34d399);
+        color:#021617;
+        border:0;
     }
 
-    button:hover{ transform:translateY(-1px); box-shadow:0 6px 18px rgba(2,6,23,0.5); }
+    button:hover{ transform:translateY(-2px); }
     button:active{ transform:translateY(0); }
 
-    button.primary{
-      background:linear-gradient(90deg, #0ea5a3, #34d399);
-      color:#021617;
-      border:0;
-    }
-
-    button.ghost{
-      background:transparent;
-      border:2px dashed rgba(255,255,255,0.04);
-    }
-
     #subs{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin:12px;
-      justify-content:center;
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+        margin:12px;
+        justify-content:center;
     }
 
     .subCard{
-      width:220px;
-      border-radius:12px;
-      padding:10px;
-      background:var(--card);
-      border:2px solid var(--border);
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      align-items:stretch;
+        width:220px;
+        border-radius:12px;
+        padding:0;
+        background: transparent;
+        border: none;
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        align-items:stretch;
     }
 
     .subCard img{
-      width:100%;
-      height:150px;
-      object-fit:cover;
-      border-radius:8px;
-      background:#071018;
-      border:2px solid rgba(255,255,255,0.02);
+        width:100%;
+        height:150px;
+        object-fit:cover;
+        border-radius:8px;
+        background:#071018;
+        border:2px solid rgba(255,255,255,0.02);
+    }
+
+    #answer{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        margin:12px;
+    }
+
+    #word{
+        font-size:72px;
+        font-weight:600;
+    }
+
+    #translation{
+        font-size:20px;
+        color:var(--muted);
+        margin-bottom:80px;
     }
 
     .leaderHeader{
-      font-weight:700;
-      color:#dff7eb;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
+        font-weight:700;
+        color:#dff7eb;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
     }
 
     .leaderList{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
+        display:flex;
+        flex-direction:column;
+        gap:6px;
     }
 
     .leaderItem{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:8px;
-      border-radius:8px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
-      border:2px solid rgba(255,255,255,0.02);
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:8px;
     }
 
     .leaderItem.self{
-      background: linear-gradient(90deg, rgba(110,231,183,0.08), rgba(14,165,163,0.03));
-      border:2px solid rgba(110,231,183,0.12);
-      color:#bfffe9;
+        background: linear-gradient(90deg, rgba(110,231,183,0.08), rgba(14,165,163,0.03));
+        border:2px solid rgba(110,231,183,0.12);
+        border-radius:8px;
+        color:#bfffe9;
     }
 
     .playerName{
-      font-weight:600;
-      color:#e6eef6;
-      font-size:13px;
+        font-weight:600;
+        color:#e6eef6;
+        font-size:13px;
     }
 
     .playerScore{
-      font-weight:700;
-      color:var(--accent);
-      font-size:13px;
+        font-weight:700;
+        color:var(--accent);
+        font-size:13px;
     }
 
-    .hidden{ display:none; }
+    #entryArea{
+        display:flex;
+        gap:8px;
+        align-items:center;
+        margin:12px;
+        justify-content:center;
+    }
+
+    #entryArea input{
+        padding:8px 10px;
+        border-radius:8px;
+        border:2px solid rgba(255,255,255,0.04);
+        background:transparent;
+        color:inherit;
+        min-width:200px;
+        font-size:14px;
+    }
+
+    #waitingArea{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+        color:var(--muted);
+        font-size:15px;
+    }
 
     @media (max-width:720px){
-      #app{ grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; margin:12px; padding:12px; }
-      #status{ grid-column: 1; }
-      #stage{ grid-column: 1; grid-row: 2; }
-      #scores{ grid-column: 1; grid-row: 3; height:auto; }
-      canvas{ height:260px; }
-      .subCard{ width:48%; }
+        body{ grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; margin:12px; padding:12px; }
+        #stage{ grid-column: 1; grid-row: 2; }
+        #scores{ grid-column: 1; grid-row: 3; height:auto; }
+        canvas{ height:260px; }
+        .subCard{ width:48%; }
     }
-  </style>
+</style>
 </head>
 <body>
-  <div id="app">
-    <div id="status">Initializing...</div>
-
     <div id="stage">
-      <div id="roundArea">
-        <audio id="audioPlayer" style="display:none;"></audio>
-        <div id="canvasWrap">
-          <canvas id="draw" width="1000" height="720"></canvas>
+        <div id="entryArea">
+            <input id="usernameInput" placeholder="Enter username" />
+            <button id="joinBtn" class="primary">Join</button>
         </div>
-        <div class="controls">
-          <button id="clear" class="ghost">Clear</button>
-          <button id="submit" class="primary">Submit Drawing</button>
+  
+        <div id="waitingArea" style="display:none;">Waiting for the round to start...</div>
+  
+        <div id="roundArea" style="display:none;">
+            <audio id="audioPlayer" style="display:none;"></audio>
+            <div id="canvasWrap">
+                <canvas id="draw" width="1000" height="720"></canvas>
+            </div>
+            <div class="controls">
+                <button id="clear" class="primary">Clear</button>
+                <button id="submit" class="primary">Submit</button>
+            </div>
         </div>
-      </div>
-
-      <div id="showdownArea" class="hidden">
-        <div id="subs"></div>
-      </div>
+  
+        <div id="showdownArea" style="display:none;">
+            <div id="answer">
+                <div id="word"></div>
+                <div id="translation"></div>
+            </div>
+            <div id="subs"></div>
+        </div>
     </div>
 
     <div id="scores"></div>
-  </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
     const socket = io();
-    const statusEl = document.getElementById('status');
     const roundArea = document.getElementById('roundArea');
     const showdownArea = document.getElementById('showdownArea');
     const audioPlayer = document.getElementById('audioPlayer');
@@ -243,68 +268,141 @@
     const submitBtn = document.getElementById('submit');
     const subsEl = document.getElementById('subs');
     const scoresEl = document.getElementById('scores');
+    const wordEl = document.getElementById('word');
+    const translationEl = document.getElementById('translation');
+
+    const entryArea = document.getElementById('entryArea');
+    const waitingArea = document.getElementById('waitingArea');
+    const joinBtn = document.getElementById('joinBtn');
+    const usernameInput = document.getElementById('usernameInput');
 
     let drawing = false;
     let last = { x: 0, y: 0 };
     let hasSubmitted = false;
-
-    // State 0: Name-selection / entry
-    // State 1: Drawing
-    // State 2: Gallery
-    // State 3: Voting
-    // State 4: Results
-    let state = 0;
-
-    function setStatus(t){ statusEl.textContent = t; }
+    let myName = null;
 
     // ensure canvas backing store matches displayed size and handles high-DPI
     function resizeCanvas(){
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const cssWidth = Math.max(1, Math.round(rect.width));
-      const cssHeight = Math.max(1, Math.round(rect.height));
-      canvas.width = Math.round(cssWidth * dpr);
-      canvas.height = Math.round(cssHeight * dpr);
-      // set transform so drawing coordinates are in CSS pixels
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      // set default stroke style
-      ctx.strokeStyle = '#e6eef6';
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const cssWidth = Math.max(1, Math.round(rect.width));
+        const cssHeight = Math.max(1, Math.round(rect.height));
+        canvas.width = Math.round(cssWidth * dpr);
+        canvas.height = Math.round(cssHeight * dpr);
+        // set transform so drawing coordinates are in CSS pixels
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        // set default stroke style
+        ctx.strokeStyle = '#e6eef6';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
+    // Confetti explodes from center outwards and then falls down
+    function playConfetti() {
+        const canvas = document.createElement("canvas");
+        canvas.style.position = "fixed";
+        canvas.style.top = 0;
+        canvas.style.left = 0;
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        canvas.style.pointerEvents = "none";
+        canvas.style.background = "transparent"; // transparent canvas
+        document.body.appendChild(canvas);
+
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const confetti = [];
+        const colors = ["#f94144","#f3722c","#f8961e","#f9844a","#f9c74f","#90be6d","#43aa8b","#577590"];
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // create particles radiating outward
+        for (let i = 0; i < 200; i++) {
+            const angle = random(0, Math.PI * 2);
+            //speed follows exponential distribution for more natural effect
+            const speed = -Math.log(Math.random()) * 10;
+            confetti.push({
+                x: centerX,
+                y: centerY*1.5,
+                r: random(3, 6),
+                c: colors[Math.floor(Math.random() * colors.length)],
+                vx: Math.cos(angle) * speed,
+                vy: (Math.sin(angle)-.5) * speed,
+                alpha: 1.0
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confetti.forEach(p => {
+                ctx.globalAlpha = p.alpha;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, false);
+                ctx.fillStyle = p.c;
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+            update();
+        }
+
+        function update() {
+            confetti.forEach(p => {
+                p.vy += 0.2; // gravity
+                p.vx *= 0.98; // air resistance
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.005; // fade out over time
+                if(p.alpha < 0) p.alpha = 0;
+            });
+        }
+
+        const animation = setInterval(draw, 16); // ~60fps
+
+        setTimeout(() => {
+            clearInterval(animation);
+            document.body.removeChild(canvas);
+        }, 5000); // 5 seconds
+    }
+
     function clearCanvas(){
-      // clear full device pixel buffer safely
-      const dpr = window.devicePixelRatio || 1;
-      ctx.save();
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.restore();
-      // ensure transform remains correct
-      resizeCanvas();
+        // clear full device pixel buffer safely
+        const dpr = window.devicePixelRatio || 1;
+        ctx.save();
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.restore();
+        // ensure transform remains correct
+        resizeCanvas();
     }
 
     function getPos(e){
-      const rect = canvas.getBoundingClientRect();
-      if (e.touches) e = e.touches[0];
-      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches) e = e.touches[0];
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
     canvas.addEventListener('pointerdown', (ev)=>{
-      canvas.setPointerCapture(ev.pointerId);
-      drawing = true; last = getPos(ev);
+        canvas.setPointerCapture(ev.pointerId);
+        drawing = true; last = getPos(ev);
     });
     canvas.addEventListener('pointermove', (ev)=>{
-      if (!drawing) return;
-      const p = getPos(ev);
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(last.x, last.y);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-      last = p;
+        if (!drawing) return;
+        const p = getPos(ev);
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        last = p;
     });
     canvas.addEventListener('pointerup', (ev)=>{ try{ canvas.releasePointerCapture(ev.pointerId); }catch(e){} drawing=false; });
     canvas.addEventListener('pointerout', ()=>{ drawing=false; });
@@ -312,154 +410,173 @@
     clearBtn.onclick = clearCanvas;
 
     function showSubmissions(submissions = [], isShowdown = false){
-      // show submissions in the shared stage
-      roundArea.classList.add('hidden');
-      showdownArea.classList.remove('hidden');
-      subsEl.innerHTML = '';
-      submissions.forEach(s => {
-        const div = document.createElement('div');
-        div.className = 'subCard';
-        const img = document.createElement('img'); img.src = s.image;
-        div.appendChild(img);
-        if (isShowdown) {
-          const btn = document.createElement('button');
-          btn.textContent = 'Vote for this';
-          btn.onclick = ()=>{ socket.emit('vote', { winnerId: s.id }); setStatus('Vote submitted'); };
-          div.appendChild(btn);
-        }
-        subsEl.appendChild(div);
-      });
-
-      // play audio automatically when the round ends (showdown) or when viewing submissions
-      audioPlayer.play().catch(()=>{});
+        // show submissions in the shared stage
+        roundArea.style.display = 'none';
+        showdownArea.style.display = 'block';
+        subsEl.innerHTML = '';
+        submissions.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'subCard';
+            const img = document.createElement('img'); img.src = s.image;
+            div.appendChild(img);
+            if (isShowdown) {
+                const btn = document.createElement('button');
+                btn.textContent = 'Vote for this';
+                btn.onclick = ()=>{
+                    socket.emit('vote', { winnerId: s.id });
+                    // Remove all vote buttons after voting
+                    document.querySelectorAll('.subCard button').forEach(b => b.remove());
+                    // Highlight voted submission
+                    img.style.border = '2px solid var(--accent)';
+                };
+                div.appendChild(btn);
+            }
+            subsEl.appendChild(div);
+        });
+  
+        // play audio automatically when the round ends (showdown) or when viewing submissions
+        audioPlayer.play().catch(()=>{});
     }
 
     submitBtn.onclick = ()=>{
-      // export at displayed resolution
-      const dataUrl = canvas.toDataURL('image/png');
-      socket.emit('submitDrawing', { imageDataUrl: dataUrl });
-      hasSubmitted = true;
-      // hide canvas area immediately after submitting
-      roundArea.classList.add('hidden');
-      showdownArea.classList.add('hidden'); // will be shown when submissions arrive
-      setStatus('Submitted — waiting for others...');
-      // request current submissions from server so submitter can view others without waiting for showdown
-      socket.emit('requestSubmissions');
+        // export at displayed resolution
+        const dataUrl = canvas.toDataURL('image/png');
+        socket.emit('submitDrawing', { imageDataUrl: dataUrl });
+        hasSubmitted = true;
+        // hide canvas area immediately after submitting
+        roundArea.style.display = 'none';
+        showdownArea.style.display = 'block';
+        // request current submissions from server so submitter can view others without waiting for showdown
+        socket.emit('requestSubmissions');
     };
 
-    socket.on('connect', ()=>{ setStatus('Connected'); });
-
-    function renderLeaderboard(scores){
-      let entries = [];
-      if (Array.isArray(scores)) {
-        entries = scores.map(s => ({ id: s.id || s.playerId || s.name, name: s.name || s.id || s.playerId, score: s.score || 0 }));
-      } else if (scores && typeof scores === 'object') {
-        entries = Object.keys(scores).map(k => ({ id: k, name: k, score: scores[k] }));
-      } else {
-        entries = [];
-      }
-      entries.sort((a,b) => b.score - a.score);
-
-      scoresEl.innerHTML = '';
-      const header = document.createElement('div');
-      header.className = 'leaderHeader';
-      const hText = document.createElement('div');
-      hText.textContent = 'Leaderboard';
-      const hNote = document.createElement('div');
-      hNote.style.fontSize = '12px'; hNote.style.color = 'var(--muted)';
-      hNote.textContent = 'Score';
-      header.appendChild(hText); header.appendChild(hNote);
-      scoresEl.appendChild(header);
-
-      const list = document.createElement('div');
-      list.className = 'leaderList';
-      entries.forEach((e, idx) => {
-        const item = document.createElement('div');
-        item.className = 'leaderItem';
-        if (e.id === socket.id) item.classList.add('self');
-        const left = document.createElement('div');
-        left.style.display = 'flex';
-        left.style.alignItems = 'center';
-        left.style.gap = '8px';
-        const rank = document.createElement('div');
-        rank.style.width = '28px';
-        rank.style.fontWeight = '700';
-        rank.style.color = idx === 0 ? 'var(--accent)' : 'var(--muted)';
-        rank.textContent = (idx+1)+'.';
-        const name = document.createElement('div');
-        name.className = 'playerName';
-        name.textContent = e.name || e.id;
-        left.appendChild(rank); left.appendChild(name);
-
-        const score = document.createElement('div');
-        score.className = 'playerScore';
-        score.textContent = e.score;
-
-        item.appendChild(left);
-        item.appendChild(score);
-        list.appendChild(item);
-      });
-
-      scoresEl.appendChild(list);
-    }
-
-    socket.on('joined', ({ scores }) => {
-      renderLeaderboard(scores || {});
-    });
+    joinBtn.onclick = ()=>{
+        const name = (usernameInput.value || '').trim();
+        if (!name) return;
+        myName = name;
+        socket.emit('join', { username: myName });
+        // remove entry area from the dom entirely since it will never be used again
+        entryArea.remove();
+        waitingArea.style.display = 'block';
+        // disable join to prevent duplicate sends
+        joinBtn.disabled = true;
+        usernameInput.disabled = true;
+    };
 
     socket.on('scoresUpdate', (scores) => {
-      renderLeaderboard(scores || {});
+        let entries = [];
+        if (Array.isArray(scores)) {
+            entries = scores.map(s => ({ id: s.id || s.playerId || s.name, name: s.name || s.id || s.playerId, score: s.score || 0 }));
+        } else if (scores && typeof scores === 'object') {
+            entries = Object.keys(scores).map(k => ({ id: k, name: k, score: scores[k] }));
+        } else {
+            entries = [];
+        }
+        entries.sort((a,b) => b.score - a.score);
+
+        scoresEl.innerHTML = '';
+        const header = document.createElement('div');
+        header.className = 'leaderHeader';
+        const hText = document.createElement('div');
+        hText.textContent = 'Leaderboard';
+        const hNote = document.createElement('div');
+        hNote.style.fontSize = '12px'; hNote.style.color = 'var(--muted)';
+        hNote.textContent = 'Score';
+        header.appendChild(hText); header.appendChild(hNote);
+        scoresEl.appendChild(header);
+
+        const list = document.createElement('div');
+        list.className = 'leaderList';
+        entries.forEach((e, idx) => {
+            const item = document.createElement('div');
+            item.className = 'leaderItem';
+            if (myName && e.id === myName) item.classList.add('self');
+            const left = document.createElement('div');
+            left.style.display = 'flex';
+            left.style.alignItems = 'center';
+            left.style.gap = '8px';
+            const rank = document.createElement('div');
+            rank.style.width = '28px';
+            rank.style.fontWeight = '700';
+            rank.style.color = idx === 0 ? 'var(--accent)' : 'var(--muted)';
+            rank.textContent = (idx+1)+'.';
+            const name = document.createElement('div');
+            name.className = 'playerName';
+            name.textContent = e.name || e.id;
+            left.appendChild(rank); left.appendChild(name);
+
+            const score = document.createElement('div');
+            score.className = 'playerScore';
+            score.textContent = e.score;
+
+            item.appendChild(left);
+            item.appendChild(score);
+            list.appendChild(item);
+        });
+
+        scoresEl.appendChild(list);
     });
 
-    socket.on('newRound', ({ word, translation, audioUrl }) => {
-      setStatus('New round! Listen and write');
-      // reset submitted state and show canvas area
-      hasSubmitted = false;
-      showdownArea.classList.add('hidden');
-      roundArea.classList.remove('hidden');
-      clearCanvas();
-      if (audioUrl) {
+    socket.on('newRound', ({ audioUrl }) => {
+        hasSubmitted = false;
+        showdownArea.style.display = 'none';
+        roundArea.style.display = 'block';
+        waitingArea.remove();
+        clearCanvas();
         audioPlayer.src = audioUrl;
         audioPlayer.play().catch(()=>{});
-      }
+        // Clear all submissions
+        subsEl.innerHTML = '';
     });
 
-    socket.on('submissionUpdate', ({ submitted }) => {
-      setStatus(`Submitted: ${submitted}`);
-    });
-
-    // server may respond with current submissions when requested
     socket.on('submissions', ({ submissions }) => {
-      if (!hasSubmitted) return;
-      showSubmissions(submissions || [], false);
+        showSubmissions(submissions || [], false);
+    });
+
+    socket.on('answer', ({ word, translation }) => {
+        wordEl.textContent = word;
+        translationEl.textContent = translation;
     });
 
     socket.on('showdown', ({ submissions }) => {
-      setStatus('Vote for the best handwriting');
-      // Only reveal submissions to users who submitted their drawing
-      if (!hasSubmitted) {
-        showdownArea.classList.add('hidden');
-        setStatus('Showdown started — you did not submit, cannot view or vote');
-        return;
-      }
-
-      // show submissions and enable voting
-      showSubmissions(submissions, true);
+        showSubmissions(submissions, true);
     });
 
-    socket.on('roundResult', ({ winner, scores }) => {
-      if (winner) setStatus(winner === socket.id ? 'You won the round!' : `Player ${winner} won`);
-      else setStatus('Round tied');
-      renderLeaderboard(scores || {});
+    socket.on('roundResult', ({ tally }) => {
+        // tally is an object { playerId: score, ... }
+        const myScore = tally[socket.id];
+        let iWon = true;
+        for (const pid in tally) {
+            if (tally[pid] > myScore) {
+                iWon = false;
+                break;
+            }
+        }
+        if (iWon) playConfetti();
+        // Add countdown to next round for 5 seconds
+        let countdown = 5;
+        const countdownDiv = document.createElement('div');
+        countdownDiv.style.position = 'fixed';
+        countdownDiv.style.top = '80%';
+        countdownDiv.style.left = '50%';
+        countdownDiv.style.transform = 'translate(-50%, -50%)';
+        countdownDiv.style.fontSize = '32px';
+        document.body.appendChild(countdownDiv);
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                countdownDiv.remove();
+            } else {
+                countdownDiv.textContent = `Next round starting in ${countdown}...`;
+            }
+        }, 1000);
     });
 
     // replay audio by pressing 'r'
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'r' || e.key === 'R') {
-        audioPlayer.play().catch(()=>{});
-        setStatus('Replaying audio');
-      }
+        if (e.key === 'r' || e.key === 'R') audioPlayer.play().catch(()=>{});
     });
-  </script>
+</script>
 </body>
 </html>
