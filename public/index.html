@@ -11,7 +11,7 @@
         --muted:#9aa4ad;
         --accent:#6ee7b7;
         --card:#0f1728;
-        --border: rgba(255,255,255,0.06);
+        --border: rgba(255,255,255,0.1);
         --radius:12px;
     }
 
@@ -67,7 +67,9 @@
         display:block;
         margin:12px auto;
         border:2px solid var(--border);
-        background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+        aspect-ratio: 16 / 9;
+        width: 90%;
+        justify-content: center;
     }
 
     canvas{
@@ -75,7 +77,7 @@
         touch-action:none;
         background:#071018;
         width:100%;
-        height:360px;
+        height:100%;
     }
 
     .controls{
@@ -83,6 +85,7 @@
         display:flex;
         gap:8px;
         align-items:center;
+        justify-content:center;
     }
 
     button{
@@ -121,11 +124,12 @@
 
     .subCard img{
         width:100%;
-        height:150px;
+        height:auto;
+        aspect-ratio: 16 / 9;
         object-fit:cover;
         border-radius:8px;
         background:#071018;
-        border:2px solid rgba(255,255,255,0.02);
+        border:2px solid rgba(255,255,255,0.1);
     }
 
     #answer{
@@ -146,6 +150,15 @@
         font-size:20px;
         color:var(--muted);
         margin-bottom:80px;
+    }
+
+    #countdown{
+        font-size:18px;
+        color:var(--muted);
+        margin-top:12px;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
     }
 
     .leaderHeader{
@@ -200,7 +213,7 @@
     #entryArea input{
         padding:8px 10px;
         border-radius:8px;
-        border:2px solid rgba(255,255,255,0.04);
+        border:2px solid rgba(255,255,255,0.1);
         background:transparent;
         color:inherit;
         min-width:200px;
@@ -220,7 +233,7 @@
         body{ grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; margin:12px; padding:12px; }
         #stage{ grid-column: 1; grid-row: 2; }
         #scores{ grid-column: 1; grid-row: 3; height:auto; }
-        canvas{ height:260px; }
+        canvas{ height:100%; }
         .subCard{ width:48%; }
     }
 </style>
@@ -237,7 +250,7 @@
         <div id="roundArea" style="display:none;">
             <audio id="audioPlayer" style="display:none;"></audio>
             <div id="canvasWrap">
-                <canvas id="draw" width="1000" height="720"></canvas>
+                <canvas id="draw" width="1600" height="900"></canvas>
             </div>
             <div class="controls">
                 <button id="clear" class="primary">Clear</button>
@@ -251,6 +264,7 @@
                 <div id="translation"></div>
             </div>
             <div id="subs"></div>
+            <div id="countdown" style="display:none;"></div>
         </div>
     </div>
 
@@ -298,6 +312,32 @@
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
+
+    function setAnswer(word, translation){
+        wordEl.textContent = word;
+        translationEl.textContent = translation;
+    }
+
+    function setCountdownText(seconds){
+        const countdownDiv = document.getElementById('countdown');
+        countdownDiv.textContent = `Next round starting in ${seconds}...`;
+    }
+
+    function addCountdown() {
+        let countdown = 5;
+        const countdownDiv = document.getElementById('countdown');
+        countdownDiv.style.display = 'block';
+        setCountdownText(countdown);
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                countdownDiv.style.display = 'none';
+            } else {
+                setCountdownText(countdown);
+            }
+        }, 1000);
+    }
 
     // Confetti explodes from center outwards and then falls down
     function playConfetti() {
@@ -439,15 +479,9 @@
     }
 
     submitBtn.onclick = ()=>{
-        // export at displayed resolution
         const dataUrl = canvas.toDataURL('image/png');
         socket.emit('submitDrawing', { imageDataUrl: dataUrl });
         hasSubmitted = true;
-        // hide canvas area immediately after submitting
-        roundArea.style.display = 'none';
-        showdownArea.style.display = 'block';
-        // request current submissions from server so submitter can view others without waiting for showdown
-        socket.emit('requestSubmissions');
     };
 
     joinBtn.onclick = ()=>{
@@ -529,17 +563,9 @@
         subsEl.innerHTML = '';
     });
 
-    socket.on('submissions', ({ submissions }) => {
-        showSubmissions(submissions || [], false);
-    });
-
-    socket.on('answer', ({ word, translation }) => {
-        wordEl.textContent = word;
-        translationEl.textContent = translation;
-    });
-
-    socket.on('showdown', ({ submissions }) => {
-        showSubmissions(submissions, true);
+    socket.on('submissions', ({ submissions, word, translation, readyToVote }) => {
+        showSubmissions(submissions, readyToVote);
+        setAnswer(word, translation);
     });
 
     socket.on('roundResult', ({ tally }) => {
@@ -547,30 +573,13 @@
         const myScore = tally[socket.id];
         let iWon = true;
         for (const pid in tally) {
-            if (tally[pid] > myScore) {
+            if (tally[pid] >= myScore && pid !== socket.id) {
                 iWon = false;
                 break;
             }
         }
         if (iWon) playConfetti();
-        // Add countdown to next round for 5 seconds
-        let countdown = 5;
-        const countdownDiv = document.createElement('div');
-        countdownDiv.style.position = 'fixed';
-        countdownDiv.style.top = '80%';
-        countdownDiv.style.left = '50%';
-        countdownDiv.style.transform = 'translate(-50%, -50%)';
-        countdownDiv.style.fontSize = '32px';
-        document.body.appendChild(countdownDiv);
-        const countdownInterval = setInterval(() => {
-            countdown--;
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                countdownDiv.remove();
-            } else {
-                countdownDiv.textContent = `Next round starting in ${countdown}...`;
-            }
-        }, 1000);
+        addCountdown();
     });
 
     // replay audio by pressing 'r'

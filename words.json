@@ -1,12 +1,77 @@
 [
+    { "word": "కుటుంబం", "translation": "family", "audio": "kutumbam.mp3" },
     { "word": "అమ్మ", "translation": "mother", "audio": "amma.mp3" },
     { "word": "నానా", "translation": "father", "audio": "nana.mp3" },
-    { "word": "పుస్తకం", "translation": "book", "audio": "pustakam.mp3" },
-    { "word": "వాన", "translation": "rain", "audio": "vana.mp3" },
-    { "word": "ఆశ", "translation": "hope", "audio": "asha.mp3" },
+    { "word": "స్నేహితులు", "translation": "friends", "audio": "snehitulu.mp3" },
     { "word": "స్నేహం", "translation": "friendship", "audio": "sneham.mp3" },
     { "word": "ప్రేమ", "translation": "love", "audio": "prema.mp3" },
+    { "word": "పరిచయాలు", "translation": "acquaintances", "audio": "parichayalu.mp3" },
+
     { "word": "సూర్యుడు", "translation": "sun", "audio": "sooryudu.mp3" },
     { "word": "చంద్రుడు", "translation": "moon", "audio": "chandrudu.mp3" },
-    { "word": "పచ్చి", "translation": "green", "audio": "pacchi.mp3" }
+    { "word": "వాన", "translation": "rain", "audio": "vana.mp3" },
+
+    { "word": "నీరు", "translation": "water", "audio": "neeru.mp3" },
+    { "word": "ఆహారం", "translation": "food", "audio": "aaharam.mp3" },
+    { "word": "ఫలం", "translation": "fruit", "audio": "phalam.mp3" },
+
+    { "word": "రూపాయి", "translation": "money", "audio": "roopayi.mp3" },
+
+    { "word": "ఇల్లు", "translation": "house", "audio": "illu.mp3" },
+    { "word": "వీధి", "translation": "street", "audio": "veedhi.mp3" },
+    { "word": "నగరం", "translation": "city", "audio": "nagaram.mp3" },
+
+    { "word":	"పాఠశాల",	"translation":	"school",	"audio":	"pathashala.mp3"	},
+    { "word":	"విద్యార్థి",	"translation":	"student",	"audio":	"vidyarthi.mp3"	},
+    { "word":	"ఉపాధ్యాయుడు",	"translation":	"teacher",	"audio":	"upadhyayudu.mp3"	},
+    { "word": "పుస్తకం", "translation": "book", "audio": "pustakam.mp3" },
+
+    { "word": "సంగీతం", "translation": "music", "audio": "sangeetam.mp3" },
+
+    { "word": "సమయం",	"translation":	"time",	"audio":	"samayam.mp3"	},
+    { "word":	"రోజు",	"translation":	"day",	"audio":	"roju.mp3"	},
+    { "word":	"వారము",	"translation":	"week",	"audio":	"varamu.mp3"	},
+    { "word":	"నెల",	"translation":"month",	"audio":	"nela.mp3"	},
+
+    { "word": "నేను", "translation": "I", "audio": "nenu.mp3" },
+    { "word": "మీరు", "translation": "you (formal)", "audio": "meeru.mp3" },
+    { "word": "నువ్వు", "translation": "you (informal)", "audio": "nuvvu.mp3" },
+    { "word": "అతను", "translation": "he", "audio": "atanu.mp3" },
+    { "word": "ఆమె", "translation": "she", "audio": "aame.mp3" },
+    { "word": "మనం", "translation": "we", "audio": "manam.mp3" },
+    { "word": "వారు", "translation": "they", "audio": "varu.mp3" },
+
+    { "word": "పచ్చి", "translation": "green", "audio": "pacchi.mp3" },
+    { "word": "నీలం", "translation": "blue", "audio": "neelam.mp3" },
+    { "word": "ఎరుపు", "translation": "red", "audio": "erupu.mp3" },
+    { "word": "పసుపు", "translation": "yellow", "audio": "pasupu.mp3" },
+    { "word": "నల్ల", "translation": "black", "audio": "nalla.mp3" },
+    { "word": "తెలుపు", "translation": "white", "audio": "telupu.mp3" },
+    { "word": "గోధుమ", "translation": "brown", "audio": "godhuma.mp3" },
+    { "word": "బూడిద", "translation": "gray", "audio": "boodida.mp3" },
+
+    { "word": "రాయడం", "translation": "to write", "audio": "rayadam.mp3" },
+    { "word": "మాట్లాడటం", "translation": "to speak", "audio": "maatladatam.mp3" },
+    { "word": "వినడం", "translation": "to listen", "audio": "vinadam.mp3" },
+    { "word": "వినిపించడం", "translation": "to hear", "audio": "vinipinchadam.mp3" },
+    { "word": "ఆలోచించడం", "translation": "to think", "audio": "alochinchadam.mp3" },
+    { "word": "కోరుకోవడం", "translation": "to want", "audio": "korukovadam.mp3" },
+    { "word": "అవసరం ఉండటం", "translation": "to need", "audio": "avasaram_undatam.mp3" },
+    { "word": "నడవడం", "translation": "to walk", "audio": "nadavadam.mp3" },
+    { "word": "పరుగెత్తడం", "translation": "to run", "audio": "parugettadam.mp3" },
+    { "word": "చెప్పడం", "translation": "to say", "audio": "cheppadam.mp3" },
+    { "word": "తెలియజేయడం", "translation": "to tell", "audio": "teliyajeyadam.mp3" },
+    { "word": "తెలుసుకోవడం", "translation": "to know", "audio": "telusukovadam.mp3" },
+
+    { "word": "పిల్లి", "translation": "cat", "audio": "pilli.mp3" },
+    { "word": "కుక్క", "translation": "dog", "audio": "kukka.mp3" },
+    { "word": "పక్షి", "translation": "bird", "audio": "pakshi.mp3" },
+    { "word": "ఆవు", "translation": "cow", "audio": "aavu.mp3" },
+    { "word": "గొర్రె", "translation": "sheep", "audio": "gorre.mp3" },
+    { "word": "మేక", "translation": "goat", "audio": "meka.mp3" },
+    { "word": "గుర్రం", "translation": "horse", "audio": "gurram.mp3" },
+    { "word": "ఏనుగు", "translation": "elephant", "audio": "enugu.mp3" },
+    { "word": "చేప", "translation": "fish", "audio": "chepa.mp3" },
+    { "word": "పంది", "translation": "pig", "audio": "pandi.mp3" },
+    { "word": "కోడి", "translation": "chicken", "audio": "kodi.mp3" }
 ]

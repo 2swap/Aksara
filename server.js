@@ -92,19 +92,22 @@ io.on('connection', (socket) => {
         submissions[socket.id] = imageDataUrl;
 
         // when all connected players have submitted, go to showdown
-        const payload = Object.entries(submissions).map(([id, img]) => ({ id, image: img }));
-        if (Object.keys(submissions).length === Object.keys(scores).length) {
-            emitToActive('showdown', { submissions: payload });
+        const allSubmitted = Object.keys(submissions).length === Object.keys(scores).length;
+        const payload = {
+            submissions: Object.entries(submissions).map(([id, img]) => ({ id, image: img })),
+            word: currentWord.word,
+            translation: currentWord.translation,
+            readyToVote: allSubmitted
+        };
+        if (allSubmitted) {
+            emitToActive('submissions', payload);
         }
         else {
             // Send all submissions to all players who have submitted
             for (const id of Object.keys(submissions)) {
-                io.to(id).emit('submissions', { submissions: payload });
+                io.to(id).emit('submissions', payload);
             }
         }
-
-        // Send the user the answer and translation
-        socket.emit('answer', { word: currentWord.word, translation: currentWord.translation });
     });
 
     socket.on('vote', ({ winnerId }) => {
