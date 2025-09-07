@@ -23,7 +23,6 @@
 
     { "word":	"పాఠశాల",	"translation":	"school",	"audio":	"pathashala.mp3"	},
     { "word":	"విద్యార్థి",	"translation":	"student",	"audio":	"vidyarthi.mp3"	},
-    { "word":	"ఉపాధ్యాయుడు",	"translation":	"teacher",	"audio":	"upadhyayudu.mp3"	},
     { "word": "పుస్తకం", "translation": "book", "audio": "pustakam.mp3" },
 
     { "word": "సంగీతం", "translation": "music", "audio": "sangeetam.mp3" },
@@ -56,7 +55,6 @@
     { "word": "వినిపించడం", "translation": "to hear", "audio": "vinipinchadam.mp3" },
     { "word": "ఆలోచించడం", "translation": "to think", "audio": "alochinchadam.mp3" },
     { "word": "కోరుకోవడం", "translation": "to want", "audio": "korukovadam.mp3" },
-    { "word": "అవసరం ఉండటం", "translation": "to need", "audio": "avasaram_undatam.mp3" },
     { "word": "నడవడం", "translation": "to walk", "audio": "nadavadam.mp3" },
     { "word": "పరుగెత్తడం", "translation": "to run", "audio": "parugettadam.mp3" },
     { "word": "చెప్పడం", "translation": "to say", "audio": "cheppadam.mp3" },
@@ -73,5 +71,26 @@
     { "word": "ఏనుగు", "translation": "elephant", "audio": "enugu.mp3" },
     { "word": "చేప", "translation": "fish", "audio": "chepa.mp3" },
     { "word": "పంది", "translation": "pig", "audio": "pandi.mp3" },
-    { "word": "కోడి", "translation": "chicken", "audio": "kodi.mp3" }
+    { "word": "కోడి", "translation": "chicken", "audio": "kodi.mp3" },
+
+    { "word": "ఒకటి", "translation": "one", "audio": "okati.mp3" },
+    { "word": "రెండు", "translation": "two", "audio": "rendu.mp3" },
+    { "word": "మూడు", "translation": "three", "audio": "moodu.mp3" },
+    { "word": "నాలుగు", "translation": "four", "audio": "nalugu.mp3" },
+    { "word": "ఐదు", "translation": "five", "audio": "aidu.mp3" },
+    { "word": "ఆరు", "translation": "six", "audio": "aaru.mp3" },
+    { "word": "ఏడు", "translation": "seven", "audio": "edu.mp3" },
+    { "word": "ఎనిమిది", "translation": "eight", "audio": "enimidi.mp3" },
+    { "word": "తొమ్మిది", "translation": "nine", "audio": "tommidi.mp3" },
+    { "word": "పది", "translation": "ten", "audio": "padi.mp3" },
+
+    { "word": "ఇరవై", "translation": "twenty", "audio": "iravai.mp3" },
+    { "word": "ముప్పై", "translation": "thirty", "audio": "muppai.mp3" },
+    { "word": "నలభై", "translation": "forty", "audio": "nalabhai.mp3" },
+    { "word": "యాభై", "translation": "fifty", "audio": "yaabhai.mp3" },
+    { "word": "అరవై", "translation": "sixty", "audio": "aravai.mp3" },
+    { "word": "డెబ్బై", "translation": "seventy", "audio": "debbai.mp3" },
+    { "word": "ఎనభై", "translation": "eighty", "audio": "enabhai.mp3" },
+    { "word": "తొంభై", "translation": "ninety", "audio": "tombhai.mp3" },
+    { "word": "వంద", "translation": "hundred", "audio": "vanda.mp3" }
 ]

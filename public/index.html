@@ -43,6 +43,7 @@
         display:block;
         height:100%;
         overflow:auto;
+        position:relative;
     }
 
     /* leaderboard on left */
@@ -68,7 +69,7 @@
         margin:12px auto;
         border:2px solid var(--border);
         aspect-ratio: 16 / 9;
-        width: 90%;
+        width: 50%;
         justify-content: center;
     }
 
@@ -111,7 +112,7 @@
     }
 
     .subCard{
-        width:220px;
+        width:320px;
         border-radius:12px;
         padding:0;
         background: transparent;
@@ -150,15 +151,6 @@
         font-size:20px;
         color:var(--muted);
         margin-bottom:80px;
-    }
-
-    #countdown{
-        font-size:18px;
-        color:var(--muted);
-        margin-top:12px;
-        align-items:center;
-        justify-content:center;
-        text-align:center;
     }
 
     .leaderHeader{
@@ -229,12 +221,33 @@
         font-size:15px;
     }
 
+    /* timer bar at bottom of stage */
+    #timerBar{
+        position:absolute;
+        left:12px;
+        right:12px;
+        bottom:12px;
+        height:10px;
+        background: rgba(255,255,255,0.04);
+        border-radius:999px;
+        overflow:hidden;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+        display:none;
+    }
+    #timerFill{
+        height:100%;
+        width:100%;
+        background: linear-gradient(90deg, var(--accent), #34d399);
+        transition: width 0.1s linear;
+    }
+
     @media (max-width:720px){
         body{ grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; margin:12px; padding:12px; }
         #stage{ grid-column: 1; grid-row: 2; }
         #scores{ grid-column: 1; grid-row: 3; height:auto; }
         canvas{ height:100%; }
         .subCard{ width:48%; }
+        #timerBar{ left:8px; right:8px; bottom:8px; }
     }
 </style>
 </head>
@@ -264,8 +277,9 @@
                 <div id="translation"></div>
             </div>
             <div id="subs"></div>
-            <div id="countdown" style="display:none;"></div>
         </div>
+
+        <div id="timerBar"><div id="timerFill"></div></div>
     </div>
 
     <div id="scores"></div>
@@ -290,10 +304,17 @@
     const joinBtn = document.getElementById('joinBtn');
     const usernameInput = document.getElementById('usernameInput');
 
+    const timerBar = document.getElementById('timerBar');
+    const timerFill = document.getElementById('timerFill');
+
     let drawing = false;
     let last = { x: 0, y: 0 };
     let hasSubmitted = false;
     let myName = null;
+
+    let timerHandle = null;
+    let timerStart = 0;
+    let timerDuration = 0;
 
     // ensure canvas backing store matches displayed size and handles high-DPI
     function resizeCanvas(){
@@ -318,25 +339,31 @@
         translationEl.textContent = translation;
     }
 
-    function setCountdownText(seconds){
-        const countdownDiv = document.getElementById('countdown');
-        countdownDiv.textContent = `Next round starting in ${seconds}...`;
-    }
+    function startTimer(seconds){
+        // clear any existing timer
+        if (timerHandle) {
+            cancelAnimationFrame(timerHandle);
+            timerHandle = null;
+        }
+        timerDuration = Math.max(0.1, seconds);
+        timerStart = performance.now();
+        timerBar.style.display = 'block';
+        timerFill.style.width = '100%';
 
-    function addCountdown() {
-        let countdown = 5;
-        const countdownDiv = document.getElementById('countdown');
-        countdownDiv.style.display = 'block';
-        setCountdownText(countdown);
-        const countdownInterval = setInterval(() => {
-            countdown--;
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                countdownDiv.style.display = 'none';
-            } else {
-                setCountdownText(countdown);
+        function tick(now){
+            const elapsed = (now - timerStart) / 1000;
+            const remaining = Math.max(0, timerDuration - elapsed);
+            const pct = (remaining / timerDuration) * 100;
+            timerFill.style.width = pct + '%';
+            if (remaining <= 0) {
+                timerBar.style.display = 'none';
+                timerFill.style.width = '0%';
+                timerHandle = null;
+                return;
             }
-        }, 1000);
+            timerHandle = requestAnimationFrame(tick);
+        }
+        timerHandle = requestAnimationFrame(tick);
     }
 
     // Confetti explodes from center outwards and then falls down
@@ -473,6 +500,25 @@
             }
             subsEl.appendChild(div);
         });
+
+        if (isShowdown) {
+            const div = document.createElement('div');
+            div.className = 'subCard';
+            // Add empty image placeholder
+            const img = document.createElement('img');
+            // Image should take up space but be invisible
+            img.style.visibility = 'hidden';
+            div.appendChild(img);
+            const btn = document.createElement('button');
+            btn.textContent = 'Abstain';
+            btn.onclick = () => {
+                socket.emit('vote', { winnerIndex: -1 });
+                document.querySelectorAll('.subCard button').forEach(b => b.remove());
+                btn.style.opacity = '0.6';
+            };
+            div.appendChild(btn);
+            subsEl.appendChild(div);
+        }
   
         // play audio automatically when the round ends (showdown) or when viewing submissions
         audioPlayer.play().catch(()=>{});
@@ -561,17 +607,21 @@
         audioPlayer.play().catch(()=>{});
         // Clear all submissions
         subsEl.innerHTML = '';
+        startTimer(60);
     });
 
     socket.on('submissions', ({ submissions, word, translation, readyToVote }) => {
         showSubmissions(submissions, readyToVote);
         setAnswer(word, translation);
+        if (readyToVote) {
+            startTimer(15);
+        }
     });
 
     socket.on('roundResult', ({ tally }) => {
         // tally is an object { playerId: score, ... }
         const myScore = tally[socket.id];
-        let iWon = true;
+        let iWon = myScore > 0;
         for (const pid in tally) {
             if (tally[pid] >= myScore && pid !== socket.id) {
                 iWon = false;
@@ -579,7 +629,8 @@
             }
         }
         if (iWon) playConfetti();
-        addCountdown();
+        // show waiting timer until next round (5s)
+        startTimer(5);
     });
 
     // replay audio by pressing 'r'

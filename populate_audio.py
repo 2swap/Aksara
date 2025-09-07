@@ -15,8 +15,19 @@ client = OpenAI(api_key=get_openai_key())
 
 def lang_tts_prompt(lang: str) -> str:
     if lang.lower() == "telugu":
-        return "తెలుగులో మాట్లాడు."  # Speak in Telugu (native)
-    return f"Speak in {lang}."
+        return "తెలుగులో రెండు వాక్యాలు మాట్లాడండి."
+    if lang.lower() == "hindi":
+        return "हिंदी में बोलो।"
+    if lang.lower() == "georgian":
+        return "ქართული ენა."
+    if lang.lower() == "japanese":
+        return "日本語で話してください。"
+    if lang.lower() == "korean":
+        return "한국어로 말하세요."
+    if lang.lower() == "tamil":
+        return "தமிழில் பேசுங்கள்."
+    else:
+        exit(f"Unsupported language: {lang}")
 
 def safe_filename(name: str, fallback: str = "audio") -> str:
     s = re.sub(r'[^A-Za-z0-9._-]', '_', name)
@@ -35,40 +46,57 @@ def generate_tts(text: str, instructions: str, audio_filepath: str):
         print(f"[ERROR] Failed to generate TTS for '{text}': {e}")
 
 def main():
-    words_path = Path("./words.json")
-    if not words_path.exists():
-        print(f"words.json not found at {words_path.resolve()}")
+    words_dir = Path("./words")
+    if not words_dir.exists() or not words_dir.is_dir():
+        print(f"words directory not found at {words_dir.resolve()}")
         return
 
-    out_dir = Path("./public/audio")
-    out_dir.mkdir(parents=True, exist_ok=True)
+    base_out_dir = Path("./public/audio")
+    base_out_dir.mkdir(parents=True, exist_ok=True)
 
-    with words_path.open("r", encoding="utf-8") as f:
-        items = json.load(f)
+    json_files = sorted(words_dir.glob("*.json"))
+    if not json_files:
+        print(f"No .json files found in {words_dir.resolve()}")
+        return
 
-    for item in items:
-        word = item.get("word")
-        audio_name = item.get("audio")
-        if not word:
-            print("[WARN] Skipping item without 'word':", item)
+    for lang_file in json_files:
+        language = lang_file.stem  # e.g., 'telugu' from 'telugu.json'
+        try:
+            instructions = lang_tts_prompt(language)
+        except Exception as e:
+            print(f"[WARN] Skipping unsupported language file {lang_file.name}: {e}")
             continue
 
-        if not audio_name or not isinstance(audio_name, str):
-            # create a safe filename from the word
-            audio_name = safe_filename(word) + ".mp3"
+        out_dir = base_out_dir / language.lower()
+        out_dir.mkdir(parents=True, exist_ok=True)
 
-        target_path = out_dir / audio_name
+        with lang_file.open("r", encoding="utf-8") as f:
+            try:
+                items = json.load(f)
+            except Exception as e:
+                print(f"[ERROR] Failed to load {lang_file}: {e}")
+                continue
 
-        if target_path.exists():
-            print(f"[SKIP] {audio_name} already exists")
-            continue
+        for item in items:
+            word = item.get("word")
+            audio_name = item.get("audio")
+            if not word:
+                print("[WARN] Skipping item without 'word':", item)
+                continue
 
-        instructions = lang_tts_prompt("Telugu")
-        print(f"[GEN] Generating audio for '{word}' -> {target_path}")
-        generate_tts(word, instructions, str(target_path))
+            if not audio_name or not isinstance(audio_name, str):
+                audio_name = safe_filename(word) + ".mp3"
+
+            target_path = out_dir / audio_name
+
+            if target_path.exists():
+                print(f"[SKIP] {language}/{audio_name} already exists")
+                continue
+
+            print(f"[GEN] Generating audio for '{word}' ({language}) -> {target_path}")
+            generate_tts(word, instructions, str(target_path))
 
     print("Done.")
 
 if __name__ == "__main__":
     main()
-
