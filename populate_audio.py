@@ -33,6 +33,23 @@ def safe_filename(name: str, fallback: str = "audio") -> str:
     s = re.sub(r'[^A-Za-z0-9._-]', '_', name)
     return s or fallback
 
+# Call OpenAI to make a simple sentence using the word
+def make_sentence(word: str, lang: str) -> str:
+    prompt = f"Make a simple sentence using the word '{word}' in {lang}, 5 words or less. Only return the sentence, no extra text."
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that makes simple sentences."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=50,
+        )
+        return word + ". " + response.choices[0].message.content.strip() + ". " + word + "."
+    except Exception as e:
+        print(f"[ERROR] Failed to generate sentence for '{word}': {e}")
+        return word
+
 def generate_tts(text: str, instructions: str, audio_filepath: str):
     try:
         with client.audio.speech.with_streaming_response.create(
@@ -94,7 +111,7 @@ def main():
                 continue
 
             print(f"[GEN] Generating audio for '{word}' ({language}) -> {target_path}")
-            generate_tts(word, instructions, str(target_path))
+            generate_tts(make_sentence(word, language), instructions, str(target_path))
 
     print("Done.")
 

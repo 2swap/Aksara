@@ -482,6 +482,11 @@
 
     clearBtn.onclick = clearCanvas;
 
+    function removeVoteButtons() {
+        document.querySelectorAll('.subCard button').forEach(b => b.remove());
+        document.getElementById('abstain').innerHTML = '';
+    }
+
     function showSubmissions(submissions = [], isShowdown = false){
         // show submissions in the shared stage
         roundArea.style.display = 'none';
@@ -497,11 +502,9 @@
                 btn.textContent = 'Vote';
                 btn.onclick = ()=>{
                     socket.emit('vote', { winnerId: s.id });
-                    // Remove all vote buttons after voting
-                    document.querySelectorAll('.subCard button').forEach(b => b.remove());
                     // Highlight voted submission
                     img.style.border = '2px solid var(--accent)';
-                    document.getElementById('abstain').innerHTML = '';
+                    removeVoteButtons();
                 };
                 div.appendChild(btn);
             }
@@ -513,8 +516,7 @@
             btn.textContent = 'Abstain';
             btn.onclick = () => {
                 socket.emit('vote', { winnerId: -1 });
-                document.querySelectorAll('.subCard button').forEach(b => b.remove());
-                document.getElementById('abstain').innerHTML = '';
+                removeVoteButtons();
             };
             document.getElementById('abstain').appendChild(btn);
         }
@@ -628,7 +630,7 @@
             }
         }
         if (iWon) playConfetti();
-        // show waiting timer until next round (5s)
+        removeVoteButtons();
         startTimer(5);
     });
 
