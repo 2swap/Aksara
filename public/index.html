@@ -271,8 +271,9 @@
                 <canvas id="draw" width="1600" height="900"></canvas>
             </div>
             <div class="controls">
-                <button id="clear" class="primary">Clear</button>
-                <button id="submit" class="primary">Submit</button>
+                <button id="clear" class="primary"><u>C</u>lear</button>
+                <button id="submit" class="primary"><u>S</u>ubmit</button>
+                <button id="replay" class="primary"><u>R</u>eplay</button>
             </div>
         </div>
   
@@ -300,6 +301,7 @@
     const ctx = canvas.getContext('2d', { alpha: true });
     const clearBtn = document.getElementById('clear');
     const submitBtn = document.getElementById('submit');
+    const replayBtn = document.getElementById('replay');
     const subsEl = document.getElementById('subs');
     const scoresEl = document.getElementById('scores');
     const wordEl = document.getElementById('word');
@@ -531,6 +533,8 @@
         hasSubmitted = true;
     };
 
+    replayBtn.onclick = ()=>{ audioPlayer.play().catch(()=>{}); };
+
     joinBtn.onclick = ()=>{
         const name = (usernameInput.value || '').trim();
         if (!name) return;
@@ -634,9 +638,20 @@
         startTimer(5);
     });
 
-    // replay audio by pressing 'r'
+    // keyboard shortcuts: C = Clear, S = Submit, R = Replay
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'r' || e.key === 'R') audioPlayer.play().catch(()=>{});
+        // ignore if typing in inputs/textareas or contenteditable
+        const active = document.activeElement;
+        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+
+        if (e.key === 'r' || e.key === 'R') {
+            audioPlayer.play().catch(()=>{});
+        } else if (e.key === 'c' || e.key === 'C') {
+            clearCanvas();
+        } else if (e.key === 's' || e.key === 'S') {
+            // prevent double submits if already submitted
+            if (!hasSubmitted) submitBtn.click();
+        }
     });
 </script>
 </body>

@@ -1,7 +1,7 @@
 [
 {"translation": "family", "word": "కుటుంబం", "audio": "kutumbam.mp3"},
 {"translation": "mother", "word": "అమ్మ", "audio": "amma.mp3"},
-{"translation": "father", "word": "నానా", "audio": "nana.mp3"},
+{"translation": "father", "word": "నాన్న", "audio": "nanna.mp3"},
 {"translation": "friends", "word": "స్నేహితులు", "audio": "snehitulu.mp3"},
 {"translation": "friendship", "word": "స్నేహం", "audio": "sneham.mp3"},
 {"translation": "love", "word": "ప్రేమ", "audio": "prema.mp3"},
@@ -121,7 +121,6 @@
 {"translation": "happy", "word": "సంతోషం", "audio": "santoshyam.mp3"},
 {"translation": "sad", "word": "దుఃఖం", "audio": "dukkham.mp3"},
 {"translation": "angry", "word": "కోపం", "audio": "kopam.mp3"},
-{"translation": "tired", "word": "దగ్గరగా", "audio": "daggaraga.mp3"},
 {"translation": "hungry", "word": "బయటపడి", "audio": "bayatapadi.mp3"},
 {"translation": "cold", "word": "చల్లగా", "audio": "challaga.mp3"},
 {"translation": "hot", "word": "వేడి", "audio": "vedi.mp3"},
